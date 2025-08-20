@@ -1,39 +1,45 @@
-import numpy as np
-import pandas as pd
+# chart.py
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 
-# Professional style
+# Set Seaborn style for professional appearance
 sns.set_style("whitegrid")
+sns.set_context("talk")
 
-# Create synthetic but realistic engagement data (7 days x 4 channels)
+# Generate synthetic data for product categories and satisfaction scores
 np.random.seed(42)
-days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
-channels = ["Email","App","Web","Support"]
-data = np.clip(np.random.normal(loc=70, scale=15, size=(len(days), len(channels))), 20, 100)
-df = pd.DataFrame(data, index=days, columns=channels)
+categories = ["Electronics", "Clothing", "Home & Kitchen", "Sports", "Beauty", "Toys"]
+satisfaction = [round(np.random.normal(loc=score, scale=0.3, size=50).mean(), 2) 
+                for score in [4.2, 3.8, 4.0, 3.5, 4.3, 3.9]]
 
-# Exact output size: 512x512 pixels at 128 DPI -> 4x4 inches
-plt.figure(figsize=(4, 4), dpi=128)
+# Create DataFrame
+df = pd.DataFrame({
+    "Category": categories,
+    "Satisfaction": satisfaction
+})
 
-ax = sns.heatmap(
-    df,
-    annot=True,
-    fmt=".0f",
-    cmap="viridis",
-    cbar_kws={"label": "Engagement score"},
-    linewidths=0.5,
-    linecolor="white",
-    square=True
+# Create figure (8x8 inches at 64 dpi = 512x512 px)
+plt.figure(figsize=(8, 8))
+
+# Create barplot
+ax = sns.barplot(
+    data=df,
+    x="Category",
+    y="Satisfaction",
+    palette="Blues_d"
 )
 
-ax.set_title("Weekly Customer Engagement Heatmap", pad=10)
-ax.set_xlabel("Channel")
-ax.set_ylabel("Day")
+# Customize chart
+ax.set_title("Average Customer Satisfaction by Product Category", fontsize=16, pad=20)
+ax.set_xlabel("Product Category", fontsize=14)
+ax.set_ylabel("Average Satisfaction Score (1–5)", fontsize=14)
+ax.set_ylim(0, 5)
 
-# Tight layout to match validation and avoid cropping
-plt.tight_layout()
+# Rotate x-labels for readability
+plt.xticks(rotation=30, ha="right")
 
-# Save exactly 512x512 with bbox_inches='tight' disabled to keep exact canvas
-plt.savefig("chart.png", dpi=128)
+# Save chart with exact size (512x512 px)
+plt.savefig("chart.png", dpi=64, bbox_inches="tight")
 plt.close()
